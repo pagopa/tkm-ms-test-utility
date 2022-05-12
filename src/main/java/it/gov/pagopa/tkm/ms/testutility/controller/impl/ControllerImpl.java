@@ -1,7 +1,9 @@
 package it.gov.pagopa.tkm.ms.testutility.controller.impl;
 
 import it.gov.pagopa.tkm.ms.testutility.controller.Controller;
+import it.gov.pagopa.tkm.ms.testutility.service.*;
 import lombok.extern.log4j.Log4j2;
+import org.bouncycastle.openpgp.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,14 +11,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class ControllerImpl implements Controller {
 
-    @Value("${spring.kafka.topics.write-queue.jaas.config.producer}")
-    private String writeQueueTopic;
+    @Autowired
+    private ProducerService producerService;
 
     @GetMapping
-    public void ciao() {
-        log.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        log.info(writeQueueTopic);
-        log.info("END !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    public void ciao() throws PGPException {
+        producerService.sendMessage("ciao");
     }
 
 }

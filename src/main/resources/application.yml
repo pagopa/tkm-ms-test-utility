@@ -78,6 +78,7 @@ keyvault:
   cryptographicKeyId: ${AZURE_KEYVAULT_PROFILE:prod}-pan-token-rsa-key
   tkmReadTokenParPanProducerSaslJaasConfig:  ${${AZURE_KEYVAULT_PROFILE:prod}-tkmReadTokenParPanProducerSaslJaasConfig:}
   tkmDeleteCardProducerSaslJaasConfig: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmDeleteCardProducerSaslJaasConfig:}
+  readQueuePubPgpKey: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmReadTokenParPanPubPgpKey}
 
 management:
   endpoints:
