@@ -20,7 +20,7 @@ public class KafkaConfiguration {
     @Value("${spring.kafka.producer.bootstrap-servers}")
     private String kafkaBootstrapServer;
 
-    @Value("${spring.kafka.producer.bootstrap-servers-cstar}")
+    @Value("${spring.kafka.consumer.bootstrap-servers-cstar}")
     private String kafkaBootstrapServerCstar;
 
     @Value("${spring.kafka.consumer.properties.security.protocol}")
