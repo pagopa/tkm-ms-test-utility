@@ -29,9 +29,6 @@ public class KafkaConfiguration {
     @Value("${spring.kafka.consumer.properties.sasl.mechanism}")
     private String consumerSaslMechanism;
 
-    @Value("${spring.kafka.topics.write-queue.jaas.config.consumer}")
-    private String writeQueueJaasConfigConsumer;
-
     @Value("${spring.kafka.topics.delete-queue.jaas.config.consumer}")
     private String deleteQueueJaasConfigConsumer;
 
@@ -56,8 +53,8 @@ public class KafkaConfiguration {
     @Value("${spring.kafka.topics.delete-queue.client-id}")
     private String deleteClientId;
 
-    @Value("${spring.kafka.topics.write-queue.jaas.config.consumer}")
-    private String writeJaasConfigConsumer;
+    @Value("${spring.kafka.topics.write-queue.jaas.config.producer}")
+    private String writeJaasConfig;
 
     @Value("${spring.kafka.topics.delete-queue.jaas.config.consumer}")
     private String deleteJaasConfigConsumer;
@@ -70,7 +67,7 @@ public class KafkaConfiguration {
 
     @Bean
     public Consumer<String, String> writeConsumer() {
-        return new KafkaConsumer<>(getConfigs(writeClientId, writeJaasConfigConsumer, writeConsumerGroup, kafkaBootstrapServerCstar));
+        return new KafkaConsumer<>(getConfigs(writeClientId, writeJaasConfig, writeConsumerGroup, kafkaBootstrapServerCstar));
     }
 
     @Bean
