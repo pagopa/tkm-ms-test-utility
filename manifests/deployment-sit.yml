@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tkmmstestutilitysit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tkmmstestutilitysit
+  template:
+    metadata:
+      labels:
+        app: tkmmstestutilitysit
+      annotations:
+        prometheus.io/path: /actuator/prometheus
+        prometheus.io/port: '8080'
+        prometheus.io/scrape: 'true'
+    spec:
+      hostAliases:
+        - ip: "10.70.67.8"
+          hostnames:
+            - "ddstkmhub.servicebus.windows.net"
+      containers:
+        - name: tkmmstestutilitysit
+          image: cstaruatregistry.azurecr.io/tkmmstestutility
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: keyvault-connection-informations
+            - configMapRef:
+                name: kafka-log-configuration
+            - configMapRef:
+                name: tkmmstestutility
+            - configMapRef:
+                name: jvm
+          resources:
+            requests:
+              memory: 4Gi
+              cpu: 500m
+            limits:
+              memory: 8Gi
+              cpu: 1000m
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+              scheme: HTTP
+            timeoutSeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+              scheme: HTTP
+            timeoutSeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 20
+            timeoutSeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 30
+          imagePullPolicy: Always
