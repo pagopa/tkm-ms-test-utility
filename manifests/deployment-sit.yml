@@ -17,9 +17,6 @@ spec:
         prometheus.io/scrape: 'true'
     spec:
       hostAliases:
-        - ip: "10.70.67.9"
-          hostnames:
-            - "tkmpgsqlt01.postgres.database.azure.com"
         - ip: "10.70.67.8"
           hostnames:
             - "ddstkmhub.servicebus.windows.net"
