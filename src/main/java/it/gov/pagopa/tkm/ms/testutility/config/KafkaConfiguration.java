@@ -20,6 +20,9 @@ public class KafkaConfiguration {
     @Value("${spring.kafka.producer.bootstrap-servers}")
     private String kafkaBootstrapServer;
 
+    @Value("${spring.kafka.producer.bootstrap-servers-cstar}")
+    private String kafkaBootstrapServerCstar;
+
     @Value("${spring.kafka.consumer.properties.security.protocol}")
     private String consumerSecurityProtocol;
 
@@ -67,17 +70,17 @@ public class KafkaConfiguration {
 
     @Bean
     public Consumer<String, String> writeConsumer() {
-        return new KafkaConsumer<>(getConfigs(writeClientId, writeJaasConfigConsumer, writeConsumerGroup));
+        return new KafkaConsumer<>(getConfigs(writeClientId, writeJaasConfigConsumer, writeConsumerGroup, kafkaBootstrapServerCstar));
     }
 
     @Bean
     public Consumer<String, String> deleteConsumer() {
-        return new KafkaConsumer<>(getConfigs(deleteClientId, deleteJaasConfigConsumer, deleteConsumerGroup));
+        return new KafkaConsumer<>(getConfigs(deleteClientId, deleteJaasConfigConsumer, deleteConsumerGroup, kafkaBootstrapServer));
     }
 
-    private Map<String, Object> getConfigs(String clientId, String jaas, String groupId) {
+    private Map<String, Object> getConfigs(String clientId, String jaas, String groupId, String server) {
         Map<String, Object> configProps = new HashMap<>();
-        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBootstrapServer);
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, server);
         configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, keyDeserializer);
         configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, valueDeserializer);
         configProps.put("security.protocol", consumerSecurityProtocol);

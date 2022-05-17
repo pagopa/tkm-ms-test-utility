@@ -21,7 +21,7 @@ public class SendToQueueControllerImpl implements SendToQueueController {
     }
 
     @Override
-    public QueueMessage sendToDeleteQueue(String message) throws PGPException {
+    public QueueMessage sendToDeleteQueue(String message) {
         return producerService.sendToDeleteQueue(message);
     }
 
