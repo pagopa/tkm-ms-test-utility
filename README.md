@@ -11,6 +11,7 @@ The following ENVIRONMENT variables are needed to deploy and run the application
 **AZURE_KEYVAULT_URI**
 **ENABLE_KAFKA_APPENDER**
 **KAFKA_APPENDER_BOOTSTRAP_SERVERS**
+**KAFKA_CSTAR_BOOTSTRAP_SERVERS**
 **KAFKA_APPENDER_SECURITY_PROTOCOL**
 **KAFKA_APPENDER_TOPIC**
 **KAFKA_DELETE_QUEUE_GROUP**
@@ -39,11 +40,3 @@ The following ENVIRONMENT variables are needed to deploy and run the application
    `git push --set-upstream origin tmp/${version}`<br>
 
 2. Merge **tmp/${version}** into **release/sit**
-
-## How to start UAT azure pipeline
-
-1. Merge **release/sit** into **release/uat**
-
-## How to start PROD azure pipeline
-
-1. Merge **release/uat** into **master**
