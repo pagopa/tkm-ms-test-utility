@@ -33,12 +33,11 @@ public final class ProducerServiceImpl implements ProducerService {
     }
 
     @Override
-    public QueueMessage sendToDeleteQueue(String message) throws PGPException {
-        String encryptedMessage = PgpStaticUtils.encrypt(message, pgpPublicKey);
-        log.info("Plain message: " + message + " - Encrypted message: " + encryptedMessage);
-        kafkaTemplate.send(deleteQueueTopic, encryptedMessage);
-        log.info("Message successfully encrypted and written on delete queue");
-        return new QueueMessage(message, encryptedMessage);
+    public QueueMessage sendToDeleteQueue(String message) {
+        log.info("Plain message: " + message);
+        kafkaTemplate.send(deleteQueueTopic, message);
+        log.info("Message successfully written on delete queue");
+        return new QueueMessage(message, null);
     }
 
 }

@@ -7,6 +7,6 @@ public interface ProducerService {
 
     QueueMessage sendToReadQueue(String message) throws PGPException;
 
-    QueueMessage sendToDeleteQueue(String message) throws PGPException;
+    QueueMessage sendToDeleteQueue(String message);
 
 }

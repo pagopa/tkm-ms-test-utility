@@ -11,6 +11,6 @@ public interface SendToQueueController {
     QueueMessage sendToReadQueue(@RequestBody String message) throws PGPException;
 
     @PostMapping("/delete-queue")
-    QueueMessage sendToDeleteQueue(@RequestBody String message) throws PGPException;
+    QueueMessage sendToDeleteQueue(@RequestBody String message);
 
 }

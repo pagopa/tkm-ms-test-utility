@@ -2,10 +2,8 @@ package it.gov.pagopa.tkm.ms.testutility.service.impl;
 
 import it.gov.pagopa.tkm.ms.testutility.model.response.*;
 import it.gov.pagopa.tkm.ms.testutility.service.*;
-import it.gov.pagopa.tkm.service.*;
 import lombok.extern.log4j.*;
 import org.apache.kafka.clients.consumer.*;
-import org.bouncycastle.openpgp.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;
 
@@ -52,14 +50,9 @@ public final class ConsumerServiceImpl implements ConsumerService {
             consumer.subscribe(Collections.singletonList(topic));
             consumer.poll(Duration.ofSeconds(1)).forEach(
                 r -> {
-                    try {
-                        String encryptedMessage = r.value();
-                        String message = PgpStaticUtils.decrypt(encryptedMessage, privatePgpKey, pgpPassphrase);
-                        log.info("Plain message: " + message + " - Encrypted message: " + encryptedMessage);
-                        lastMessages.add(new QueueMessage(message, encryptedMessage));
-                    } catch (PGPException e) {
-                        throw new RuntimeException(e);
-                    }
+                    String message = r.value();
+                    log.info("Plain message: " + message);
+                    lastMessages.add(new QueueMessage(message, null));
                 }
             );
             consumer.commitSync();
