@@ -55,7 +55,6 @@ spring:
         jaas:
           config:
             producer: ${keyvault.tkmWriteUpdateTokenProducerSaslJaasConfig}
-            consumer: ${keyvault.tkmWriteUpdateTokenConsumerSaslJaasConfig}
 
 server:
   port: ${SERVER_PORT:8080}
@@ -74,7 +73,6 @@ azure:
 keyvault:
   tkmReadTokenParPanConsumerSaslJaasConfig: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmReadTokenParPanConsumerSaslJaasConfig:}
   tkmWriteUpdateTokenProducerSaslJaasConfig: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmWriteUpdateTokenProducerSaslJaasConfig:}
-  tkmWriteUpdateTokenConsumerSaslJaasConfig: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmWriteUpdateTokenConsumerSaslJaasConfig:}
   tkmDeleteCardConsumerSaslJaasConfig: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmDeleteCardConsumerSaslJaasConfig:}
   tkmReadTokenParPanPvtPgpKey: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmReadTokenParPanPvtPgpKey}
   tkmReadTokenParPanPvtPgpKeyPassphrase: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmReadTokenParPanPvtPgpKeyPassphrase:}
