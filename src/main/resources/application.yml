@@ -46,7 +46,7 @@ spring:
         concurrency: ${KAFKA_DELETE_MAX_NUMBER_OF_THREADS:1}
         jaas:
           config:
-            producer: ${keyvault.tkmDeleteCardProducerSaslJaasConfig}
+            producer: ${keyvault.tkmDeleteCardConsumerSaslJaasConfig}
             consumer: ${keyvault.tkmDeleteCardConsumerSaslJaasConfig}
       write-queue:
         name: ${KAFKA_WRITE_QUEUE_TOPIC}
@@ -78,8 +78,7 @@ keyvault:
   tkmReadTokenParPanPvtPgpKeyPassphrase: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmReadTokenParPanPvtPgpKeyPassphrase:}
   apimSubscriptionTkmRtd: ${${AZURE_KEYVAULT_PROFILE:prod}-apimSubscriptionTkmRtd}
   cryptographicKeyId: ${AZURE_KEYVAULT_PROFILE:prod}-pan-token-rsa-key
-  tkmReadTokenParPanProducerSaslJaasConfig:  ${${AZURE_KEYVAULT_PROFILE:prod}-tkmReadTokenParPanProducerSaslJaasConfig:}
-  tkmDeleteCardProducerSaslJaasConfig: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmDeleteCardProducerSaslJaasConfig:}
+  tkmReadTokenParPanProducerSaslJaasConfig: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmReadTokenParPanProducerSaslJaasConfig:}
   readQueuePubPgpKey: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmReadTokenParPanPubPgpKey}
 
 management:
