@@ -35,26 +35,29 @@ spring:
         group-id: ${KAFKA_READ_QUEUE_GROUP}
         client-id: ${KAFKA_READ_QUEUE_GROUP}${HOSTNAME:0}
         concurrency: ${KAFKA_READ_MAX_NUMBER_OF_THREADS:1}
-        jaas:
-          config:
-            producer: ${keyvault.tkmReadTokenParPanProducerSaslJaasConfig}
-            consumer: ${keyvault.tkmReadTokenParPanConsumerSaslJaasConfig}
+        sasl:
+          jaas:
+            config:
+              producer: ${keyvault.tkmReadTokenParPanProducerSaslJaasConfig}
+              consumer: ${keyvault.tkmReadTokenParPanConsumerSaslJaasConfig}
       delete-queue:
         name: ${KAFKA_DELETE_QUEUE_TOPIC}
         group-id: ${KAFKA_DELETE_QUEUE_GROUP}
         client-id: ${KAFKA_DELETE_QUEUE_GROUP}${HOSTNAME:0}
         concurrency: ${KAFKA_DELETE_MAX_NUMBER_OF_THREADS:1}
-        jaas:
-          config:
-            producer: ${keyvault.tkmDeleteCardConsumerSaslJaasConfig}
-            consumer: ${keyvault.tkmDeleteCardConsumerSaslJaasConfig}
+        sasl:
+          jaas:
+            config:
+              producer: ${keyvault.tkmDeleteCardConsumerSaslJaasConfig}
+              consumer: ${keyvault.tkmDeleteCardConsumerSaslJaasConfig}
       write-queue:
         name: ${KAFKA_WRITE_QUEUE_TOPIC}
         group-id: ${KAFKA_WRITE_QUEUE_GROUP}
         client-id: ${KAFKA_WRITE_QUEUE_GROUP:}${HOSTNAME:0}
-        jaas:
-          config:
-            producer: ${keyvault.tkmWriteUpdateTokenProducerSaslJaasConfig}
+        sasl:
+          jaas:
+            config:
+              producer: ${keyvault.tkmWriteUpdateTokenProducerSaslJaasConfig}
 
 server:
   port: ${SERVER_PORT:8080}
@@ -77,7 +80,6 @@ keyvault:
   tkmReadTokenParPanPvtPgpKey: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmReadTokenParPanPvtPgpKey}
   tkmReadTokenParPanPvtPgpKeyPassphrase: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmReadTokenParPanPvtPgpKeyPassphrase:}
   apimSubscriptionTkmRtd: ${${AZURE_KEYVAULT_PROFILE:prod}-apimSubscriptionTkmRtd}
-  cryptographicKeyId: ${AZURE_KEYVAULT_PROFILE:prod}-pan-token-rsa-key
   tkmReadTokenParPanProducerSaslJaasConfig: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmReadTokenParPanProducerSaslJaasConfig:}
   readQueuePubPgpKey: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmReadTokenParPanPubPgpKey}
 
