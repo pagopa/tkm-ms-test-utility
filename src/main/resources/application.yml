@@ -48,7 +48,7 @@ spring:
         sasl:
           jaas:
             config:
-              producer: ${keyvault.tkmDeleteCardConsumerSaslJaasConfig}
+              producer: ${keyvault.tkmDeleteCardProducerSaslJaasConfig}
               consumer: ${keyvault.tkmDeleteCardConsumerSaslJaasConfig}
       write-queue:
         name: ${KAFKA_WRITE_QUEUE_TOPIC}
@@ -77,6 +77,7 @@ keyvault:
   tkmReadTokenParPanConsumerSaslJaasConfig: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmReadTokenParPanConsumerSaslJaasConfig:}
   tkmWriteUpdateTokenProducerSaslJaasConfig: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmWriteUpdateTokenProducerSaslJaasConfig:}
   tkmDeleteCardConsumerSaslJaasConfig: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmDeleteCardConsumerSaslJaasConfig:}
+  tkmDeleteCardProducerSaslJaasConfig: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmDeleteCardProducerSaslJaasConfig:}
   tkmReadTokenParPanPvtPgpKey: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmReadTokenParPanPvtPgpKey}
   tkmReadTokenParPanPvtPgpKeyPassphrase: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmReadTokenParPanPvtPgpKeyPassphrase:}
   apimSubscriptionTkmRtd: ${${AZURE_KEYVAULT_PROFILE:prod}-apimSubscriptionTkmRtd}

@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
-import org.springframework.kafka.core.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,9 +48,6 @@ public class KafkaConfiguration {
     @Value("${spring.kafka.consumer.auto-offset-reset}")
     private String autoOffsetReset;
 
-    @Value("${spring.kafka.consumer.max-poll-records}")
-    private String maxPollRecords;
-
     @Value("${spring.kafka.producer.properties.security.protocol}")
     private String producerSecurityProtocol;
 
@@ -73,6 +69,9 @@ public class KafkaConfiguration {
     @Value("${spring.kafka.topics.delete-queue.sasl.jaas.config.consumer}")
     private String deleteJaasConfigConsumer;
 
+    @Value("${spring.kafka.topics.delete-queue.sasl.jaas.config.producer}")
+    private String deleteJaasConfigProducer;
+
     @Value("${spring.kafka.topics.read-queue.sasl.jaas.config.consumer}")
     private String readJaasConfig;
 
@@ -90,11 +89,6 @@ public class KafkaConfiguration {
         return new KafkaConsumer<>(getConfigs(writeClientId, writeJaasConfig, writeConsumerGroup, kafkaBootstrapServerCstar, true));
     }
 
-    @Bean
-    public Consumer<String, String> deleteConsumer() {
-        return new KafkaConsumer<>(getConfigs(deleteClientId, deleteJaasConfigConsumer, deleteConsumerGroup, kafkaBootstrapServer, true));
-    }
-
     @Bean(name = "readProducer")
     public KafkaProducer<String, String> readProducer() {
         return new KafkaProducer<>(getConfigs(readClientId, readJaasConfig, readGroup, kafkaBootstrapServer, false));
@@ -102,7 +96,14 @@ public class KafkaConfiguration {
 
     @Bean(name = "deleteProducer")
     public KafkaProducer<String, String> deleteProducer() {
-        return new KafkaProducer<>(getConfigs(deleteClientId, deleteJaasConfigConsumer, deleteConsumerGroup, kafkaBootstrapServer, false));
+        Map<String, Object> configProps = getConfigs(deleteClientId, deleteJaasConfigProducer, deleteConsumerGroup, kafkaBootstrapServer, false);
+        return new KafkaProducer<>(configProps);
+    }
+
+    @Bean
+    public Consumer<String, String> deleteConsumer() {
+        Map<String, Object> configProps = getConfigs(deleteClientId, deleteJaasConfigConsumer, deleteConsumerGroup, kafkaBootstrapServer, true);
+        return new KafkaConsumer<>(configProps);
     }
 
     private Map<String, Object> getConfigs(String clientId, String jaas, String groupId, String server, boolean consumer) {
