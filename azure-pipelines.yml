@@ -25,32 +25,30 @@ variables:
   isUAT: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/release/uat'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix'))]
   isPROD: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
 
-  ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/release/sit') }}:
+  ${{ if eq(variables.isSIT, true) }}:
     dockerRegistryServiceConnection: 'tkm-cstaruatregistry-connector'
     containerRegistry: 'cstaruatregistry.azurecr.io'
-    deployment: deployment-sit
     enviroment: sit
     imagePullSecret: 'tkmsitregistry-auth'
-  ${{ if or(eq(variables['Build.SourceBranch'], 'refs/heads/release/uat'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix')) }}:
-    containerRegistry: 'cstaruatregistry.azurecr.io'
-    deployment: deployment-uat
-    imagePullSecret: 'tkmuatregistry-auth'
-    enviroment: uat
+  ${{ if eq(variables.isUAT, true) }}:
     dockerRegistryServiceConnection: 'tkm-cstaruatregistry-connector'
-  ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
+    containerRegistry: 'cstaruatregistry.azurecr.io'
+    enviroment: uat
+    imagePullSecret: 'tkmuatregistry-auth'
+  ${{ if eq(variables.isPROD, true) }}:
     dockerRegistryServiceConnection: 'tkm-cstaruatregistry-connector'
     containerRegistry: ''
-    deployment: ''
     imagePullSecret: ''
     enviroment: prod
-  ${{ if and(not(startsWith(variables['Build.SourceBranch'], 'refs/heads/release')), ne(variables['Build.SourceBranch'], 'refs/heads/master'), not(startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix'))) }}:
+  ${{ if and(ne(variables.isSIT, true), ne(variables.isUAT, true), ne(variables.isPROD, true)) }}:
     dockerRegistryServiceConnection: ''
+    enviroment: sit
 
   maven_cache_folder: $(Pipeline.Workspace)/.m2/repository
 
 stages:
-  - stage: Test_Develop
-    displayName: Test Develop
+  - stage: Test_Develop_Release
+    displayName: Test Develop and Prepare Release
     condition: or(eq(variables.isPullRequest, true), and(ne(variables.isSIT, true), ne(variables.isUAT, true), ne(variables.isPROD, true)))
     jobs:
       - job: Test
@@ -77,7 +75,7 @@ stages:
             inputs:
               mavenPomFile: 'pom.xml'
               goals: 'package'
-              options: '-B -s $(settingsxml.secureFilePath) -T1C -DskipTests=false  -Dmaven.repo.local=$(maven_cache_folder)'
+              options: '-B -s $(settingsxml.secureFilePath) -T1C -Dmaven.repo.local=$(maven_cache_folder)'
               javaHomeOption: 'JDKVersion'
               jdkVersionOption: '1.8'
               mavenVersionOption: 'Default'
@@ -86,9 +84,111 @@ stages:
               effectivePomSkip: true
               sonarQubeRunAnalysis: false
 
+      - job: Release
+        displayName: Prepare release
+        dependsOn: Test
+        pool:
+          vmImage: $(vmImageNameDefault)
+        steps:
+          - checkout: self
+            persistCredentials: true
+          - task: DownloadSecureFile@1
+            displayName: 'download settings.xml for Maven'
+            name: settingsxml
+            inputs:
+              secureFile: 'settings_v2.xml'
+              retryCount: '2'
+          - task: Cache@2
+            displayName: Cache Maven
+            inputs:
+              key: 'maven | "$(Agent.OS)" | tkmtestutility'
+              restoreKeys: |
+                maven | "$(Agent.OS)" | tkmtestutility
+                maven | "$(Agent.OS)"
+                maven
+              path: $(maven_cache_folder)
+
+          - task: Bash@3
+            displayName: Git config
+            name: setgitconfig
+            inputs:
+              targetType: 'inline'
+              script: |
+                git config user.name "tkm_build_service"
+              failOnStderr: true
+
+          - task: Bash@3
+            displayName: Git checkout
+            name: gitcheckout
+            inputs:
+              targetType: 'inline'
+              script: |
+                git checkout -q ${{ variables['Build.SourceBranchName'] }}
+              failOnStderr: true
+
+          - task: Bash@3
+            displayName: Get release version
+            name: getreleaseversion
+            inputs:
+              targetType: 'inline'
+              script: |
+                releaseVersion=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -s $(settingsxml.secureFilePath))
+                releaseVersion=${releaseVersion/-SNAPSHOT/}
+                echo "##vso[task.setvariable variable=version;isOutput=true]$releaseVersion"
+                echo "Current Release Version ${releaseVersion}"
+              failOnStderr: true
+
+          - task: Maven@3
+            inputs:
+              mavenPomFile: 'pom.xml'
+              goals: 'release:clean release:prepare '
+              options: '--batch-mode -DscmCommentPrefix="[skip ci]" -s $(settingsxml.secureFilePath) -T1C -Darguments=-DskipTests -Dmaven.repo.local=$(maven_cache_folder)'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.8'
+              mavenVersionOption: 'Default'
+              mavenOptions: '-Xmx3072m'
+              mavenAuthenticateFeed: false
+              effectivePomSkip: true
+              sonarQubeRunAnalysis: false
+
+          - task: Bash@3
+            displayName: Git push on develop branch
+            name: gitpushdev
+            inputs:
+              targetType: 'inline'
+              script: |
+                git push -q origin ${{ variables['Build.SourceBranchName'] }}
+              failOnStderr: true
+
+          - task: Bash@3
+            displayName: Git push on tag
+            name: gitpushtag
+            inputs:
+              targetType: 'inline'
+              script: |
+                git push -q origin --tags
+              failOnStderr: true
+
+          - task: Bash@3
+            displayName: Git create tmp branch
+            name: gitcreatetmp
+            inputs:
+              targetType: 'inline'
+              script: |
+                git checkout -q -b tmp/$(getreleaseversion.version) test-utility-$(getreleaseversion.version)
+              failOnStderr: true
+
+          - task: Bash@3
+            displayName: Git push on tmp branch
+            name: gitpushtmp
+            inputs:
+              targetType: 'inline'
+              script: |
+                git push -q --set-upstream origin tmp/$(getreleaseversion.version)
+
   - stage: POM
     displayName: POM
-    condition: eq(variables.isToDeploy, true)
+    condition: and(eq(variables.isToDeploy, true),or(eq(variables.isSIT, true),eq(variables.isUAT, true),eq(variables.isPROD, true)))
     jobs:
       - job: POM
         displayName: POM
@@ -191,13 +291,85 @@ stages:
                     artifactName: 'manifests'
                     targetPath: '$(Pipeline.Workspace)/manifests'
                 - task: KubernetesManifest@0
+                  displayName: 'Create Namespace'
+                  inputs:
+                    namespace: tkm-sit
+                    action: deploy
+                    kubernetesServiceConnection: 'ddsakstest-self-connection-tkm-sit'
+                    manifests: |
+                      $(Pipeline.Workspace)/manifests/namespace-$(enviroment).yml
+                - task: DownloadSecureFile@1
+                  displayName: 'download keyvault-connection-informations.yaml'
+                  name: keyvaultconnectioninformations
+                  inputs:
+                    secureFile: keyvault-connection-informations-$(enviroment).yaml
+                    retryCount: '2'
+                - task: DownloadSecureFile@1
+                  displayName: 'download jvm.yaml'
+                  name: jvm
+                  inputs:
+                    secureFile: jvm-$(enviroment).yaml
+                    retryCount: '2'
+                - task: DownloadSecureFile@1
+                  displayName: 'download kafka-log-configuration.yaml'
+                  name: kafkalogconfiguration
+                  inputs:
+                    secureFile: kafka-log-configuration-$(enviroment).yaml
+                    retryCount: '2'
+                - task: DownloadSecureFile@1
+                  displayName: 'download tkmmstestutility.yaml'
+                  name: tkmmstestutility
+                  inputs:
+                    secureFile: tkmmstestutility-$(enviroment).yaml
+                    retryCount: '2'
+                - task: Kubernetes@1
+                  displayName: 'apply keyvault-connection-informations.yaml'
+                  inputs:
+                    connectionType: Azure Resource Manager
+                    azureSubscriptionEndpoint: 'PM-subscription-sit'
+                    azureResourceGroup: 'DDS-Kubernetes'
+                    kubernetesCluster: 'ddsakstest'
+                    command: apply
+                    useConfigurationFile: true
+                    configuration: $(keyvaultconnectioninformations.secureFilePath)
+                - task: Kubernetes@1
+                  displayName: 'apply jvm.yaml'
+                  inputs:
+                    connectionType: Azure Resource Manager
+                    azureSubscriptionEndpoint: 'PM-subscription-sit'
+                    azureResourceGroup: 'DDS-Kubernetes'
+                    kubernetesCluster: 'ddsakstest'
+                    command: apply
+                    useConfigurationFile: true
+                    configuration: $(jvm.secureFilePath)
+                - task: Kubernetes@1
+                  displayName: 'apply kafka-log-configuration.yaml'
+                  inputs:
+                    connectionType: Azure Resource Manager
+                    azureSubscriptionEndpoint: 'PM-subscription-sit'
+                    azureResourceGroup: 'DDS-Kubernetes'
+                    kubernetesCluster: 'ddsakstest'
+                    command: apply
+                    useConfigurationFile: true
+                    configuration: $(kafkalogconfiguration.secureFilePath)
+                - task: Kubernetes@1
+                  displayName: 'apply tkmmstestutility.yaml'
+                  inputs:
+                    connectionType: Azure Resource Manager
+                    azureSubscriptionEndpoint: 'PM-subscription-sit'
+                    azureResourceGroup: 'DDS-Kubernetes'
+                    kubernetesCluster: 'ddsakstest'
+                    command: apply
+                    useConfigurationFile: true
+                    configuration: $(tkmmstestutility.secureFilePath)
+                - task: KubernetesManifest@0
                   displayName: Deploy to Kubernetes cluster
                   inputs:
                     namespace: tkm-sit
                     action: deploy
                     kubernetesServiceConnection: 'ddsakstest-self-connection-tkm-sit'
                     manifests: |
-                      $(Pipeline.Workspace)/manifests/$(deployment).yml
+                      $(Pipeline.Workspace)/manifests/deployment-$(enviroment).yml
                       $(Pipeline.Workspace)/manifests/service-$(enviroment).yml
                       $(Pipeline.Workspace)/manifests/ingress-$(enviroment).yml
                     imagePullSecrets: |
@@ -230,7 +402,7 @@ stages:
         displayName: Deploy
         condition: and(succeeded(), eq(variables.isToDeploy, true), eq(variables.isUAT, true))
         pool:
-          name: uat_agent_pool
+          name: pagopa-agent-pool-uat
         environment: 'uat'
         strategy:
           runOnce:
@@ -243,13 +415,85 @@ stages:
                     artifactName: 'manifests'
                     targetPath: '$(Pipeline.Workspace)/manifests'
                 - task: KubernetesManifest@0
+                  displayName: 'Create Namespace'
+                  inputs:
+                    namespace: tkm-uat
+                    action: deploy
+                    kubernetesServiceConnection: 'u87-aks-pci-uat-self-connection-tkm'
+                    manifests: |
+                      $(Pipeline.Workspace)/manifests/namespace-$(enviroment).yml
+                - task: DownloadSecureFile@1
+                  displayName: 'download keyvault-connection-informations.yaml'
+                  name: keyvaultconnectioninformations
+                  inputs:
+                    secureFile: keyvault-connection-informations-$(enviroment).yaml
+                    retryCount: '2'
+                - task: DownloadSecureFile@1
+                  displayName: 'download jvm.yaml'
+                  name: jvm
+                  inputs:
+                    secureFile: jvm-$(enviroment).yaml
+                    retryCount: '2'
+                - task: DownloadSecureFile@1
+                  displayName: 'download kafka-log-configuration.yaml'
+                  name: kafkalogconfiguration
+                  inputs:
+                    secureFile: kafka-log-configuration-$(enviroment).yaml
+                    retryCount: '2'
+                - task: DownloadSecureFile@1
+                  displayName: 'download tkmmstestutility.yaml'
+                  name: tkmmstestutility
+                  inputs:
+                    secureFile: tkmmstestutility-$(enviroment).yaml
+                    retryCount: '2'
+                - task: Kubernetes@1
+                  displayName: 'apply keyvault-connection-informations.yaml'
+                  inputs:
+                    connectionType: Azure Resource Manager
+                    azureSubscriptionEndpoint: 'U87-PagoPa-PCI-uat(e7feb90c-fcc2-40a2-ba56-d68ec301c6c0)'
+                    azureResourceGroup: 'U87-AKS-pci-uat'
+                    kubernetesCluster: 'U87-AKS-pci-uat'
+                    command: apply
+                    useConfigurationFile: true
+                    configuration: $(keyvaultconnectioninformations.secureFilePath)
+                - task: Kubernetes@1
+                  displayName: 'apply jvm.yaml'
+                  inputs:
+                    connectionType: Azure Resource Manager
+                    azureSubscriptionEndpoint: 'U87-PagoPa-PCI-uat(e7feb90c-fcc2-40a2-ba56-d68ec301c6c0)'
+                    azureResourceGroup: 'U87-AKS-pci-uat'
+                    kubernetesCluster: 'U87-AKS-pci-uat'
+                    command: apply
+                    useConfigurationFile: true
+                    configuration: $(jvm.secureFilePath)
+                - task: Kubernetes@1
+                  displayName: 'apply kafka-log-configuration.yaml'
+                  inputs:
+                    connectionType: Azure Resource Manager
+                    azureSubscriptionEndpoint: 'U87-PagoPa-PCI-uat(e7feb90c-fcc2-40a2-ba56-d68ec301c6c0)'
+                    azureResourceGroup: 'U87-AKS-pci-uat'
+                    kubernetesCluster: 'U87-AKS-pci-uat'
+                    command: apply
+                    useConfigurationFile: true
+                    configuration: $(kafkalogconfiguration.secureFilePath)
+                - task: Kubernetes@1
+                  displayName: 'apply tkmmstestutility.yaml'
+                  inputs:
+                    connectionType: Azure Resource Manager
+                    azureSubscriptionEndpoint: 'U87-PagoPa-PCI-uat(e7feb90c-fcc2-40a2-ba56-d68ec301c6c0)'
+                    azureResourceGroup: 'U87-AKS-pci-uat'
+                    kubernetesCluster: 'U87-AKS-pci-uat'
+                    command: apply
+                    useConfigurationFile: true
+                    configuration: $(tkmmstestutility.secureFilePath)
+                - task: KubernetesManifest@0
                   displayName: Deploy to Kubernetes cluster
                   inputs:
                     namespace: tkm-uat
                     action: deploy
-                    kubernetesServiceConnection: 'ddsakstest-self-connection-tkm-uat'
+                    kubernetesServiceConnection: 'u87-aks-pci-uat-self-connection-tkm'
                     manifests: |
-                      $(Pipeline.Workspace)/manifests/$(deployment).yml
+                      $(Pipeline.Workspace)/manifests/deployment-$(enviroment).yml
                       $(Pipeline.Workspace)/manifests/service-$(enviroment).yml
                       $(Pipeline.Workspace)/manifests/ingress-$(enviroment).yml
                     imagePullSecrets: |
