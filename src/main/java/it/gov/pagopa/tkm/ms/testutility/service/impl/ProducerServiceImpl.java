@@ -32,7 +32,7 @@ public final class ProducerServiceImpl implements ProducerService {
     public QueueMessage sendToReadQueue(String message) throws PGPException {
         String encryptedMessage = PgpStaticUtils.encrypt(message, pgpPublicKey);
         log.info("Plain message: " + message + " - Encrypted message: " + encryptedMessage);
-        readProducer.send(new ProducerRecord<>(readQueueTopic, message));
+        readProducer.send(new ProducerRecord<>(readQueueTopic, encryptedMessage));
         log.info("Message successfully encrypted and written on read queue");
         return new QueueMessage(message, encryptedMessage);
     }
