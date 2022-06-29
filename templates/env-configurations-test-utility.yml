@@ -120,7 +120,7 @@ steps:
                   objectType: secret
                   objectVersion: ""
                 - |
-                  objectName: ${{ parameters.env }}-kafka-write-queue-group
+                  objectName: ${{ parameters.env }}-kafka-write-queue-group-test
                   objectType: secret
                   objectVersion: ""
                 - |
@@ -174,7 +174,7 @@ steps:
                   objectName: ${{ parameters.env }}-kafka-servers
                 - key: KAFKA_CSTAR_BOOTSTRAP_SERVERS
                   objectName: ${{ parameters.env }}-kafka-cstar-bootstrap-servers
-                - key: KAFKA_WRITE_QUEUE_GROUP
-                  objectName: ${{ parameters.env }}-kafka-write-queue-group
+                - key: KAFKA_WRITE_QUEUE_GROUP_TEST
+                  objectName: ${{ parameters.env }}-kafka-write-queue-group-test
                 - key: KAFKA_WRITE_QUEUE_TOPIC
                   objectName: ${{ parameters.env }}-kafka-write-queue-topic

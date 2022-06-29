@@ -52,8 +52,8 @@ spring:
               consumer: ${keyvault.tkmDeleteCardConsumerSaslJaasConfig}
       write-queue:
         name: ${KAFKA_WRITE_QUEUE_TOPIC}
-        group-id: ${KAFKA_WRITE_QUEUE_GROUP}
-        client-id: ${KAFKA_WRITE_QUEUE_GROUP:}${HOSTNAME:0}
+        group-id: ${KAFKA_WRITE_QUEUE_GROUP_TEST}
+        client-id: ${KAFKA_WRITE_QUEUE_GROUP_TEST:}${HOSTNAME:0}
         sasl:
           jaas:
             config:

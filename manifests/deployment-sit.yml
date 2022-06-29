@@ -140,10 +140,10 @@ spec:
                 secretKeyRef:
                   key: KAFKA_CSTAR_BOOTSTRAP_SERVERS
                   name: tkmmstestutility
-            - name: KAFKA_WRITE_QUEUE_GROUP
+            - name: KAFKA_WRITE_QUEUE_GROUP_TEST
               valueFrom:
                 secretKeyRef:
-                  key: KAFKA_WRITE_QUEUE_GROUP
+                  key: KAFKA_WRITE_QUEUE_GROUP_TEST
                   name: tkmmstestutility
             - name: KAFKA_WRITE_QUEUE_TOPIC
               valueFrom:
