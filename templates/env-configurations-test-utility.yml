@@ -96,7 +96,7 @@ steps:
                   objectType: secret
                   objectVersion: ""
                 - |
-                  objectName: ${{ parameters.env }}-kafka-delete-queue-group
+                  objectName: ${{ parameters.env }}-kafka-delete-queue-group-test
                   objectType: secret
                   objectVersion: ""
                 - |
@@ -162,8 +162,8 @@ steps:
             - secretName: tkmmstestutility
               type: Opaque
               data:
-                - key: KAFKA_DELETE_QUEUE_GROUP
-                  objectName: ${{ parameters.env }}-kafka-delete-queue-group
+                - key: KAFKA_DELETE_QUEUE_GROUP_TEST
+                  objectName: ${{ parameters.env }}-kafka-delete-queue-group-test
                 - key: KAFKA_DELETE_QUEUE_TOPIC
                   objectName: ${{ parameters.env }}-kafka-delete-queue-topic
                 - key: KAFKA_READ_QUEUE_GROUP

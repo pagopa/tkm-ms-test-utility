@@ -110,10 +110,10 @@ spec:
                 secretKeyRef:
                   key: AZURE_KEYVAULT_URI
                   name: keyvault-connection-informations
-            - name: KAFKA_DELETE_QUEUE_GROUP
+            - name: KAFKA_DELETE_QUEUE_GROUP_TEST
               valueFrom:
                 secretKeyRef:
-                  key: KAFKA_DELETE_QUEUE_GROUP
+                  key: KAFKA_DELETE_QUEUE_GROUP_TEST
                   name: tkmmstestutility
             - name: KAFKA_DELETE_QUEUE_TOPIC
               valueFrom:
