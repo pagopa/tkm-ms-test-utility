@@ -104,7 +104,7 @@ steps:
                   objectType: secret
                   objectVersion: ""
                 - |
-                  objectName: ${{ parameters.env }}-kafka-read-queue-group
+                  objectName: ${{ parameters.env }}-kafka-read-queue-group-test
                   objectType: secret
                   objectVersion: ""
                 - |
@@ -166,8 +166,8 @@ steps:
                   objectName: ${{ parameters.env }}-kafka-delete-queue-group-test
                 - key: KAFKA_DELETE_QUEUE_TOPIC
                   objectName: ${{ parameters.env }}-kafka-delete-queue-topic
-                - key: KAFKA_READ_QUEUE_GROUP
-                  objectName: ${{ parameters.env }}-kafka-read-queue-group
+                - key: KAFKA_READ_QUEUE_GROUP_TEST
+                  objectName: ${{ parameters.env }}-kafka-read-queue-group-test
                 - key: KAFKA_READ_QUEUE_TOPIC
                   objectName: ${{ parameters.env }}-kafka-read-queue-topic
                 - key: KAFKA_SERVERS
