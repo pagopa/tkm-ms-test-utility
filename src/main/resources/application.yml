@@ -32,8 +32,8 @@ spring:
     topics:
       read-queue:
         name: ${KAFKA_READ_QUEUE_TOPIC}
-        group-id: ${KAFKA_READ_QUEUE_GROUP}
-        client-id: ${KAFKA_READ_QUEUE_GROUP}${HOSTNAME:0}
+        group-id: ${KAFKA_READ_QUEUE_GROUP_TEST}
+        client-id: ${KAFKA_READ_QUEUE_GROUP_TEST}${HOSTNAME:0}
         concurrency: ${KAFKA_READ_MAX_NUMBER_OF_THREADS:1}
         sasl:
           jaas:
@@ -42,8 +42,8 @@ spring:
               consumer: ${keyvault.tkmReadTokenParPanConsumerSaslJaasConfig}
       delete-queue:
         name: ${KAFKA_DELETE_QUEUE_TOPIC}
-        group-id: ${KAFKA_DELETE_QUEUE_GROUP}
-        client-id: ${KAFKA_DELETE_QUEUE_GROUP}${HOSTNAME:0}
+        group-id: ${KAFKA_DELETE_QUEUE_GROUP_TEST}
+        client-id: ${KAFKA_DELETE_QUEUE_GROUP_TEST}${HOSTNAME:0}
         concurrency: ${KAFKA_DELETE_MAX_NUMBER_OF_THREADS:1}
         sasl:
           jaas:
@@ -52,8 +52,8 @@ spring:
               consumer: ${keyvault.tkmDeleteCardConsumerSaslJaasConfig}
       write-queue:
         name: ${KAFKA_WRITE_QUEUE_TOPIC}
-        group-id: ${KAFKA_WRITE_QUEUE_GROUP}
-        client-id: ${KAFKA_WRITE_QUEUE_GROUP:}${HOSTNAME:0}
+        group-id: ${KAFKA_WRITE_QUEUE_GROUP_TEST}
+        client-id: ${KAFKA_WRITE_QUEUE_GROUP_TEST:}${HOSTNAME:0}
         sasl:
           jaas:
             config:
