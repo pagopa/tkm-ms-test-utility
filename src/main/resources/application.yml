@@ -75,7 +75,7 @@ azure:
 
 keyvault:
   tkmReadTokenParPanConsumerSaslJaasConfig: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmReadTokenParPanConsumerSaslJaasConfig:}
-  tkmWriteUpdateTokenProducerSaslJaasConfig: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmWriteUpdateTokenProducerSaslJaasConfig:}
+  tkmWriteUpdateTokenConsumerSaslJaasConfig: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmWriteUpdateTokenConsumerSaslJaasConfig:}
   tkmDeleteCardConsumerSaslJaasConfig: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmDeleteCardConsumerSaslJaasConfig:}
   tkmDeleteCardProducerSaslJaasConfig: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmDeleteCardProducerSaslJaasConfig:}
   tkmReadTokenParPanPvtPgpKey: ${${AZURE_KEYVAULT_PROFILE:prod}-tkmReadTokenParPanPvtPgpKey}
