@@ -63,7 +63,7 @@ public class KafkaConfiguration {
     @Value("${spring.kafka.topics.delete-queue.client-id}")
     private String deleteClientId;
 
-    @Value("${spring.kafka.topics.write-queue.sasl.jaas.config.producer}")
+    @Value("${spring.kafka.topics.write-queue.sasl.jaas.config.consumer}")
     private String writeJaasConfig;
 
     @Value("${spring.kafka.topics.delete-queue.sasl.jaas.config.consumer}")
@@ -130,4 +130,3 @@ public class KafkaConfiguration {
     }
 
 }
-
