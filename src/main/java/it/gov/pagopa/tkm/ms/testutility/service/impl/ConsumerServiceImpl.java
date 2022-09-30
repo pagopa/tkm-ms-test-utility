@@ -2,10 +2,8 @@ package it.gov.pagopa.tkm.ms.testutility.service.impl;
 
 import it.gov.pagopa.tkm.ms.testutility.model.response.*;
 import it.gov.pagopa.tkm.ms.testutility.service.*;
-import it.gov.pagopa.tkm.service.*;
 import lombok.extern.log4j.*;
 import org.apache.kafka.clients.consumer.*;
-import org.bouncycastle.openpgp.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;
 
@@ -38,33 +36,23 @@ public final class ConsumerServiceImpl implements ConsumerService {
 
     @Override
     public List<QueueMessage> readFromWriteQueue() {
-        return readFromQueue(writeConsumer, writeQueueTopic, true);
+        return readFromQueue(writeConsumer, writeQueueTopic);
     }
 
     @Override
     public List<QueueMessage> readFromDeleteQueue() {
-        return readFromQueue(deleteConsumer, deleteQueueTopic, false);
+        return readFromQueue(deleteConsumer, deleteQueueTopic);
     }
 
-    private List<QueueMessage> readFromQueue(Consumer<String, String> consumer, String topic, boolean isEncrypted) {
+    private List<QueueMessage> readFromQueue(Consumer<String, String> consumer, String topic) {
         List<QueueMessage> lastMessages = new ArrayList<>();
         try {
             consumer.subscribe(Collections.singletonList(topic));
-            consumer.poll(Duration.ofSeconds(2)).forEach(
+            consumer.poll(Duration.ofSeconds(10)).forEach(
                 r -> {
                     String message = r.value();
-                    if (isEncrypted) {
-                        try {
-                            String plainMessage = PgpStaticUtils.decrypt(message, privatePgpKey, pgpPassphrase);
-                            log.info("Plain message: " + plainMessage + " - Encrypted message: " + message);
-                            lastMessages.add(new QueueMessage(plainMessage, message));
-                        } catch (PGPException e) {
-                            throw new RuntimeException(e);
-                        }
-                    } else {
-                        log.info("Plain message: " + message);
-                        lastMessages.add(new QueueMessage(message, null));
-                    }
+                    log.info("Plain message: " + message);
+                    lastMessages.add(new QueueMessage(message, null));
                 }
             );
             consumer.commitSync();
