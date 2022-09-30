@@ -50,7 +50,7 @@ public final class ConsumerServiceImpl implements ConsumerService {
         List<QueueMessage> lastMessages = new ArrayList<>();
         try {
             consumer.subscribe(Collections.singletonList(topic));
-            consumer.poll(Duration.ofSeconds(5)).forEach(
+            consumer.poll(Duration.ofSeconds(2)).forEach(
                 r -> {
                     String message = r.value();
                     if (isEncrypted) {
