@@ -127,6 +127,10 @@ steps:
                   objectName: ${{ parameters.env }}-kafka-write-queue-topic
                   objectType: secret
                   objectVersion: ""
+                - |
+                  objectName: ${{ parameters.env }}-applicationinsights-connection-string
+                  objectType: secret
+                  objectVersion: ""
           secretObjects:
             - secretName: jvm
               type: Opaque
@@ -178,3 +182,8 @@ steps:
                   objectName: ${{ parameters.env }}-kafka-write-queue-group-test
                 - key: KAFKA_WRITE_QUEUE_TOPIC
                   objectName: ${{ parameters.env }}-kafka-write-queue-topic
+            - secretName: applicationinsights
+              type: Opaque
+              data:
+                - key: APPLICATIONINSIGHTS_CONNECTION_STRING
+                  objectName: ${{ parameters.env }}-applicationinsights-connection-string

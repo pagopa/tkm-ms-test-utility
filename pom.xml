@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>test-utility</artifactId>
-    <version>1.0.28</version>
+    <version>1.0.29</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>it.gov.pagopa.tkm.ms</groupId>
         <artifactId>starter-parent</artifactId>
-		<version>4.2.0</version>
+		<version>4.2.1</version>
     </parent>
 
     <dependencies>
@@ -36,6 +36,10 @@
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
             <version>2.12.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.azure</groupId>
+            <artifactId>applicationinsights-agent</artifactId>
         </dependency>
     </dependencies>
 
@@ -76,6 +80,6 @@
 
     <scm>
         <developerConnection>scm:git:https://github.com/pagopa/tkm-ms-test-utility.git</developerConnection>
-        <tag>test-utility-1.0.28</tag>
+        <tag>test-utility-1.0.29</tag>
     </scm>
 </project>
